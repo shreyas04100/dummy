@@ -1,0 +1,43 @@
+mvn archetype:generate -DgroupId=in.tcs -DartifactId=prg6 -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DinteractiveMode=false
+cd prg6
+mvn package
+java -cp target/prg6-1.0-SNAPSHOT.jar in.tcs
+
+git config --global user.name "shreyas04100"
+git config --global user.mail "shgk23cs@cmrit.ac.in"
+ssh-keygen -t ed25519 -C "shgk23cs@cmrit.ac.in"
+cat ~/.ssh/id_ed25519.pub
+git init
+git add pom.xml
+git add src
+git commit -m "first commit"
+git branch -M main
+git remote set-url origin git@github.com:shreyas04100/demoprg6.git
+git push -u origin main
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+pipeline {
+ agent any
+
+ stages {
+
+  stage('Checkout') {
+   steps {
+    git branch: 'main', url: 'https://github.com/shreyas04100/demoprg6.git'
+   }
+  }
+
+  stage('Build') {
+   steps {
+    sh 'mvn clean package'
+   }
+  }
+
+  stage('Test') {
+   steps {
+    sh 'mvn test'
+   }
+  }
+
+ }
+}
