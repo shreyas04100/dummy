@@ -1,0 +1,72 @@
+ansible --version
+
+cd C2_183
+
+gedit hosts.ini
+
+ansible all -i hosts.ini --list-hosts
+
+ansible all -i hosts.ini -m ping
+
+gedit mybp.yml
+
+ansible-playbook -i hosts.ini mybp.yml
+
+mkdir -p library
+cd library
+
+gedit first_module.py
+
+chmod +x first_module.py
+
+cd ..
+
+gedit mybp2.yml
+
+ansible-playbook -i hosts.ini mybp2.yml
+
+hosts.ini
+[local]
+localhost ansible_connection=local
+
+mybp.yml
+- name: First Playbook
+  hosts: local
+  connection: local
+  tasks:
+    - name: Typing yml code
+      debug:
+        msg: "Ansible is a config management tool"
+
+first_module.py
+#!/usr/bin/python
+from ansible.module_utils.basic import AnsibleModule
+
+def walk():
+    module_args = dict(name=dict(type='str', required=True))
+    module = AnsibleModule(argument_spec=module_args)
+
+    result = {
+        "changed": False,
+        "message": f"Welcome,{module.params['name']}!"
+    }
+
+    module.exit_json(**result)
+
+if __name__ == '__main__':
+    walk()
+
+mybp2.yml
+- name: Ansible with one Module
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Welcome friends
+      first_module:
+        name: "Ansible"
+      register: result
+
+    - name: Show message
+      debug:
+        msg: "{{ result.message }}"
